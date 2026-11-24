@@ -42,8 +42,12 @@ back a SQL string plus an ordered parameter list.
 The project is not yet published to a public repository. Build and install it locally:
 
 ```bash
-mvn clean install
+mvn clean install              # snapshot build (default): 1.0-SNAPSHOT
+mvn clean install -Prelease    # release build: 1.0, plus sources and javadoc jars
 ```
+
+The base version is the `revision` property in `pom.xml`; the active profile
+(`snapshot` by default, or `release`) decides whether `-SNAPSHOT` is appended.
 
 Then add it to your project:
 
