@@ -33,13 +33,30 @@ public final class JoinClause {
     private final String   second;
     private final String   softDeleteColumn; // null → no soft-delete filter on this join
 
-    /** Constructs a join with no soft-delete awareness. */
+    /**
+     * Constructs a join with no soft-delete awareness.
+     *
+     * @param type     the join type
+     * @param table    the table to join
+     * @param first    the left-hand column of the ON condition
+     * @param operator the ON condition operator, e.g. {@code =}
+     * @param second   the right-hand column of the ON condition
+     */
     public JoinClause(JoinType type, String table,
                       String first, String operator, String second) {
         this(type, table, first, operator, second, null);
     }
 
-    /** Constructs a join that optionally carries a soft-delete column. */
+    /**
+     * Constructs a join that optionally carries a soft-delete column.
+     *
+     * @param type             the join type
+     * @param table            the table to join
+     * @param first            the left-hand column of the ON condition
+     * @param operator         the ON condition operator, e.g. {@code =}
+     * @param second           the right-hand column of the ON condition
+     * @param softDeleteColumn the joined table's soft-delete column, or {@code null} for none
+     */
     public JoinClause(JoinType type, String table,
                       String first, String operator, String second,
                       String softDeleteColumn) {
@@ -51,10 +68,16 @@ public final class JoinClause {
         this.softDeleteColumn = softDeleteColumn;
     }
 
+    /** {@return the join type} */
     public JoinType getType()             { return type; }
+    /** {@return the joined table} */
     public String   getTable()            { return table; }
+    /** {@return the left-hand column of the ON condition} */
     public String   getFirst()            { return first; }
+    /** {@return the ON condition operator} */
     public String   getOperator()         { return operator; }
+    /** {@return the right-hand column of the ON condition} */
     public String   getSecond()           { return second; }
+    /** {@return the joined table's soft-delete column, or {@code null} for none} */
     public String   getSoftDeleteColumn() { return softDeleteColumn; }
 }

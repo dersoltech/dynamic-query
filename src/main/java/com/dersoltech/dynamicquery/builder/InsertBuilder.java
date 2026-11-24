@@ -45,6 +45,15 @@ public class InsertBuilder {
     private final String                             table;
     private final List<LinkedHashMap<String, Object>> rows;
 
+    /**
+     * Creates an INSERT builder for the given table and rows.
+     *
+     * <p>The columns are taken from the first row's keys.
+     *
+     * @param table the target table name
+     * @param rows  the rows to insert, each a column name to value map
+     * @throws IllegalArgumentException if {@code table} is blank or {@code rows} is empty
+     */
     public InsertBuilder(String table, List<LinkedHashMap<String, Object>> rows) {
         if (table == null || table.isBlank()) {
             throw new IllegalArgumentException("Table name must not be blank");
@@ -60,7 +69,11 @@ public class InsertBuilder {
     // SQL generation
     // =========================================================================
 
-    /** Returns an INSERT statement with inline literal values. */
+    /**
+     * Returns an INSERT statement with inline literal values.
+     *
+     * @return the SQL string
+     */
     public String sql() {
         List<String> cols = columnNames();
         StringBuilder sb = buildPrefix(cols);
@@ -81,6 +94,8 @@ public class InsertBuilder {
      * corresponding ordered parameter values.
      *
      * <p>Parameters are ordered row-by-row, column-by-column.
+     *
+     * @return the SQL and its parameters
      */
     public ParameterizedQuery parameterizedSql() {
         List<String> cols   = columnNames();

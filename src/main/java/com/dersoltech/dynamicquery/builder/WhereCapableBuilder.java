@@ -35,9 +35,17 @@ import java.util.List;
  */
 public abstract class WhereCapableBuilder<T extends WhereCapableBuilder<T>> {
 
+    /** The target table name. */
     protected final String           table;
+    /** User-supplied WHERE predicates, in the order they were added. */
     protected final List<WhereClause> wheres = new ArrayList<>();
 
+    /**
+     * Creates a builder targeting the given table.
+     *
+     * @param table the target table name
+     * @throws IllegalArgumentException if {@code table} is null or blank
+     */
     protected WhereCapableBuilder(String table) {
         if (table == null || table.isBlank()) {
             throw new IllegalArgumentException("Table name must not be blank");
@@ -45,6 +53,11 @@ public abstract class WhereCapableBuilder<T extends WhereCapableBuilder<T>> {
         this.table = table;
     }
 
+    /**
+     * Returns this builder cast to its concrete type, for fluent chaining.
+     *
+     * @return this builder
+     */
     @SuppressWarnings("unchecked")
     protected final T self() { return (T) this; }
 
@@ -52,126 +65,256 @@ public abstract class WhereCapableBuilder<T extends WhereCapableBuilder<T>> {
     // WHERE
     // =========================================================================
 
-    /** {@code AND column = value} */
+    /**
+     * {@code AND column = value}
+     *
+     * @param column the column name
+     * @param value the value to compare against
+     * @return this builder
+     */
     public T where(String column, Object value) {
         return where(column, "=", value);
     }
 
-    /** {@code AND column operator value} */
+    /**
+     * {@code AND column operator value}
+     *
+     * @param column the column name
+     * @param operator the comparison operator, e.g. {@code >}
+     * @param value the value to compare against
+     * @return this builder
+     */
     public T where(String column, String operator, Object value) {
         wheres.add(WhereClause.basic(WhereType.AND, column, operator, value));
         return self();
     }
 
-    /** {@code OR column = value} */
+    /**
+     * {@code OR column = value}
+     *
+     * @param column the column name
+     * @param value the value to compare against
+     * @return this builder
+     */
     public T orWhere(String column, Object value) {
         return orWhere(column, "=", value);
     }
 
-    /** {@code OR column operator value} */
+    /**
+     * {@code OR column operator value}
+     *
+     * @param column the column name
+     * @param operator the comparison operator, e.g. {@code >}
+     * @param value the value to compare against
+     * @return this builder
+     */
     public T orWhere(String column, String operator, Object value) {
         wheres.add(WhereClause.basic(WhereType.OR, column, operator, value));
         return self();
     }
 
-    /** {@code AND column IN (values)} */
+    /**
+     * {@code AND column IN (values)}
+     *
+     * @param column the column name
+     * @param values the values to match
+     * @return this builder
+     */
     public T whereIn(String column, Collection<?> values) {
         wheres.add(WhereClause.in(WhereType.AND, column, toObjectList(values)));
         return self();
     }
 
-    /** {@code OR column IN (values)} */
+    /**
+     * {@code OR column IN (values)}
+     *
+     * @param column the column name
+     * @param values the values to match
+     * @return this builder
+     */
     public T orWhereIn(String column, Collection<?> values) {
         wheres.add(WhereClause.in(WhereType.OR, column, toObjectList(values)));
         return self();
     }
 
-    /** {@code AND column NOT IN (values)} */
+    /**
+     * {@code AND column NOT IN (values)}
+     *
+     * @param column the column name
+     * @param values the values to exclude
+     * @return this builder
+     */
     public T whereNotIn(String column, Collection<?> values) {
         wheres.add(WhereClause.notIn(WhereType.AND, column, toObjectList(values)));
         return self();
     }
 
-    /** {@code OR column NOT IN (values)} */
+    /**
+     * {@code OR column NOT IN (values)}
+     *
+     * @param column the column name
+     * @param values the values to exclude
+     * @return this builder
+     */
     public T orWhereNotIn(String column, Collection<?> values) {
         wheres.add(WhereClause.notIn(WhereType.OR, column, toObjectList(values)));
         return self();
     }
 
-    /** {@code AND column IS NULL} */
+    /**
+     * {@code AND column IS NULL}
+     *
+     * @param column the column name
+     * @return this builder
+     */
     public T whereNull(String column) {
         wheres.add(WhereClause.isNull(WhereType.AND, column));
         return self();
     }
 
-    /** {@code OR column IS NULL} */
+    /**
+     * {@code OR column IS NULL}
+     *
+     * @param column the column name
+     * @return this builder
+     */
     public T orWhereNull(String column) {
         wheres.add(WhereClause.isNull(WhereType.OR, column));
         return self();
     }
 
-    /** {@code AND column IS NOT NULL} */
+    /**
+     * {@code AND column IS NOT NULL}
+     *
+     * @param column the column name
+     * @return this builder
+     */
     public T whereNotNull(String column) {
         wheres.add(WhereClause.isNotNull(WhereType.AND, column));
         return self();
     }
 
-    /** {@code OR column IS NOT NULL} */
+    /**
+     * {@code OR column IS NOT NULL}
+     *
+     * @param column the column name
+     * @return this builder
+     */
     public T orWhereNotNull(String column) {
         wheres.add(WhereClause.isNotNull(WhereType.OR, column));
         return self();
     }
 
-    /** {@code AND column LIKE pattern} — caller supplies wildcards. */
+    /**
+     * {@code AND column LIKE pattern} — caller supplies wildcards.
+     *
+     * @param column the column name
+     * @param pattern the LIKE pattern, including any wildcards
+     * @return this builder
+     */
     public T whereLike(String column, String pattern) {
         wheres.add(WhereClause.like(WhereType.AND, column, pattern, null));
         return self();
     }
 
-    /** {@code OR column LIKE pattern} — caller supplies wildcards. */
+    /**
+     * {@code OR column LIKE pattern} — caller supplies wildcards.
+     *
+     * @param column the column name
+     * @param pattern the LIKE pattern, including any wildcards
+     * @return this builder
+     */
     public T orWhereLike(String column, String pattern) {
         wheres.add(WhereClause.like(WhereType.OR, column, pattern, null));
         return self();
     }
 
-    /** {@code AND column NOT LIKE pattern} — caller supplies wildcards. */
+    /**
+     * {@code AND column NOT LIKE pattern} — caller supplies wildcards.
+     *
+     * @param column the column name
+     * @param pattern the LIKE pattern, including any wildcards
+     * @return this builder
+     */
     public T whereNotLike(String column, String pattern) {
         wheres.add(WhereClause.notLike(WhereType.AND, column, pattern, null));
         return self();
     }
 
-    /** {@code OR column NOT LIKE pattern} — caller supplies wildcards. */
+    /**
+     * {@code OR column NOT LIKE pattern} — caller supplies wildcards.
+     *
+     * @param column the column name
+     * @param pattern the LIKE pattern, including any wildcards
+     * @return this builder
+     */
     public T orWhereNotLike(String column, String pattern) {
         wheres.add(WhereClause.notLike(WhereType.OR, column, pattern, null));
         return self();
     }
 
-    /** {@code AND column LIKE '%value%'} — wildcards in {@code value} match literally. */
+    /**
+     * {@code AND column LIKE '%value%'} — wildcards in {@code value} match literally.
+     *
+     * @param column the column name
+     * @param value the text to match literally
+     * @return this builder
+     */
     public T whereContains(String column, String value) {
         return escapedLike(WhereType.AND, column, "%" + SqlFormatter.escapeLike(value) + "%");
     }
 
-    /** {@code OR column LIKE '%value%'} — wildcards in {@code value} match literally. */
+    /**
+     * {@code OR column LIKE '%value%'} — wildcards in {@code value} match literally.
+     *
+     * @param column the column name
+     * @param value the text to match literally
+     * @return this builder
+     */
     public T orWhereContains(String column, String value) {
         return escapedLike(WhereType.OR, column, "%" + SqlFormatter.escapeLike(value) + "%");
     }
 
-    /** {@code AND column LIKE 'value%'} — wildcards in {@code value} match literally. */
+    /**
+     * {@code AND column LIKE 'value%'} — wildcards in {@code value} match literally.
+     *
+     * @param column the column name
+     * @param value the text to match literally
+     * @return this builder
+     */
     public T whereStartsWith(String column, String value) {
         return escapedLike(WhereType.AND, column, SqlFormatter.escapeLike(value) + "%");
     }
 
-    /** {@code OR column LIKE 'value%'} — wildcards in {@code value} match literally. */
+    /**
+     * {@code OR column LIKE 'value%'} — wildcards in {@code value} match literally.
+     *
+     * @param column the column name
+     * @param value the text to match literally
+     * @return this builder
+     */
     public T orWhereStartsWith(String column, String value) {
         return escapedLike(WhereType.OR, column, SqlFormatter.escapeLike(value) + "%");
     }
 
-    /** {@code AND column LIKE '%value'} — wildcards in {@code value} match literally. */
+    /**
+     * {@code AND column LIKE '%value'} — wildcards in {@code value} match literally.
+     *
+     * @param column the column name
+     * @param value the text to match literally
+     * @return this builder
+     */
     public T whereEndsWith(String column, String value) {
         return escapedLike(WhereType.AND, column, "%" + SqlFormatter.escapeLike(value));
     }
 
-    /** {@code OR column LIKE '%value'} — wildcards in {@code value} match literally. */
+    /**
+     * {@code OR column LIKE '%value'} — wildcards in {@code value} match literally.
+     *
+     * @param column the column name
+     * @param value the text to match literally
+     * @return this builder
+     */
     public T orWhereEndsWith(String column, String value) {
         return escapedLike(WhereType.OR, column, "%" + SqlFormatter.escapeLike(value));
     }
@@ -181,13 +324,23 @@ public abstract class WhereCapableBuilder<T extends WhereCapableBuilder<T>> {
         return self();
     }
 
-    /** {@code AND <rawSql>} — caller is responsible for correct SQL. */
+    /**
+     * {@code AND <rawSql>} — caller is responsible for correct SQL.
+     *
+     * @param rawSql the SQL fragment, inserted verbatim
+     * @return this builder
+     */
     public T whereRaw(String rawSql) {
         wheres.add(WhereClause.raw(WhereType.AND, rawSql));
         return self();
     }
 
-    /** {@code OR <rawSql>} — caller is responsible for correct SQL. */
+    /**
+     * {@code OR <rawSql>} — caller is responsible for correct SQL.
+     *
+     * @param rawSql the SQL fragment, inserted verbatim
+     * @return this builder
+     */
     public T orWhereRaw(String rawSql) {
         wheres.add(WhereClause.raw(WhereType.OR, rawSql));
         return self();
@@ -204,6 +357,8 @@ public abstract class WhereCapableBuilder<T extends WhereCapableBuilder<T>> {
      * (e.g. {@code QueryBuilder} for soft-delete filtering) may override this
      * to inject automatic conditions without touching the user-visible
      * {@code wheres} list.
+     *
+     * @return the clauses to emit before the user-supplied predicates
      */
     protected List<WhereClause> prependWhereClauses() {
         return List.of();
@@ -215,6 +370,7 @@ public abstract class WhereCapableBuilder<T extends WhereCapableBuilder<T>> {
      * <p>Prepended clauses (from {@link #prependWhereClauses()}) are emitted
      * first, followed by user-added predicates.
      *
+     * @param sb     the SQL being built
      * @param params if non-null, values are replaced with {@code ?} and
      *               appended to this list; if null, values are inlined.
      */
@@ -284,7 +440,12 @@ public abstract class WhereCapableBuilder<T extends WhereCapableBuilder<T>> {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     * Copies a collection of arbitrary element type into a mutable {@code List<Object>}.
+     *
+     * @param values the values to copy
+     * @return a new list containing {@code values}
+     */
     protected static List<Object> toObjectList(Collection<?> values) {
         return new ArrayList<>(values);
     }

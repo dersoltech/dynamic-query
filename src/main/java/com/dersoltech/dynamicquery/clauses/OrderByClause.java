@@ -25,11 +25,19 @@ public final class OrderByClause {
     private final String column;
     private final OrderDirection direction;
 
+    /**
+     * Creates an ORDER BY entry.
+     *
+     * @param column    the column to sort by
+     * @param direction the sort direction
+     */
     public OrderByClause(String column, OrderDirection direction) {
         this.column    = column;
         this.direction = direction;
     }
 
+    /** {@return the column to sort by} */
     public String         getColumn()    { return column; }
+    /** {@return the sort direction} */
     public OrderDirection getDirection() { return direction; }
 }

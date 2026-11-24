@@ -36,6 +36,8 @@ public @interface Column {
     /**
      * The column name in the database table.
      * Defaults to the annotated field's name when blank.
+     *
+     * @return the column name, or an empty string to use the field name
      */
     String name() default "";
 }

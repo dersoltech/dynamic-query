@@ -55,6 +55,8 @@ public @interface SoftDeleted {
      * The column that stores the soft-delete timestamp.
      * A {@code NULL} value means the row is active; non-{@code NULL} means deleted.
      * Defaults to {@code "deleted_at"}.
+     *
+     * @return the soft-delete column name
      */
     String column() default "deleted_at";
 }

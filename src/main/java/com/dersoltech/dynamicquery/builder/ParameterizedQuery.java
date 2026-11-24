@@ -35,5 +35,8 @@ import java.util.List;
  * // pq.sql()        → "SELECT * FROM users WHERE active = ? AND role IN (?, ?) LIMIT 10"
  * // pq.parameters() → [true, "admin", "editor"]
  * }</pre>
+ *
+ * @param sql        the SQL string with {@code ?} placeholders
+ * @param parameters the parameter values, in placeholder order
  */
 public record ParameterizedQuery(String sql, List<Object> parameters) {}

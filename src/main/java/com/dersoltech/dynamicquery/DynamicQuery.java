@@ -60,6 +60,8 @@ public final class DynamicQuery {
      * <p>If the class is also annotated with {@code @SoftDeleted}, the builder
      * automatically adds a soft-delete filter to every generated SELECT.
      *
+     * @param modelClass a class annotated with {@code @Model}
+     * @return a new SELECT builder
      * @throws IllegalArgumentException if the class lacks a {@code @Model} annotation
      */
     public static QueryBuilder from(Class<?> modelClass) {
@@ -68,7 +70,12 @@ public final class DynamicQuery {
                 ModelInspector.getSoftDeleteColumn(modelClass));
     }
 
-    /** Creates a {@link QueryBuilder} targeting an explicit table name. */
+    /**
+     * Creates a {@link QueryBuilder} targeting an explicit table name.
+     *
+     * @param tableName the table to select from
+     * @return a new SELECT builder
+     */
     public static QueryBuilder table(String tableName) {
         return new QueryBuilder(tableName);
     }
@@ -77,17 +84,36 @@ public final class DynamicQuery {
     // INSERT
     // =========================================================================
 
-    /** Builds an INSERT for a single row into the given table. */
+    /**
+     * Builds an INSERT for a single row into the given table.
+     *
+     * @param tableName the table to insert into
+     * @param row       column name to value map; iteration order sets column order
+     * @return a new INSERT builder
+     */
     public static InsertBuilder insert(String tableName, Map<String, Object> row) {
         return new InsertBuilder(tableName, List.of(new LinkedHashMap<>(row)));
     }
 
-    /** Builds an INSERT for a single row, resolving the table from {@code @Model}. */
+    /**
+     * Builds an INSERT for a single row, resolving the table from {@code @Model}.
+     *
+     * @param modelClass a class annotated with {@code @Model}
+     * @param row        column name to value map; iteration order sets column order
+     * @return a new INSERT builder
+     * @throws IllegalArgumentException if the class lacks a {@code @Model} annotation
+     */
     public static InsertBuilder insert(Class<?> modelClass, Map<String, Object> row) {
         return insert(ModelInspector.getTableName(modelClass), row);
     }
 
-    /** Builds a multi-row INSERT into the given table. */
+    /**
+     * Builds a multi-row INSERT into the given table.
+     *
+     * @param tableName the table to insert into
+     * @param rows      the rows to insert; the first row's keys set the columns
+     * @return a new INSERT builder
+     */
     public static InsertBuilder insertBatch(String tableName,
                                             List<? extends Map<String, Object>> rows) {
         List<LinkedHashMap<String, Object>> linked = rows.stream()
@@ -96,7 +122,14 @@ public final class DynamicQuery {
         return new InsertBuilder(tableName, linked);
     }
 
-    /** Builds a multi-row INSERT, resolving the table from {@code @Model}. */
+    /**
+     * Builds a multi-row INSERT, resolving the table from {@code @Model}.
+     *
+     * @param modelClass a class annotated with {@code @Model}
+     * @param rows       the rows to insert; the first row's keys set the columns
+     * @return a new INSERT builder
+     * @throws IllegalArgumentException if the class lacks a {@code @Model} annotation
+     */
     public static InsertBuilder insertBatch(Class<?> modelClass,
                                             List<? extends Map<String, Object>> rows) {
         return insertBatch(ModelInspector.getTableName(modelClass), rows);
@@ -106,12 +139,23 @@ public final class DynamicQuery {
     // UPDATE
     // =========================================================================
 
-    /** Creates an {@link UpdateBuilder} targeting the given table. */
+    /**
+     * Creates an {@link UpdateBuilder} targeting the given table.
+     *
+     * @param tableName the table to update
+     * @return a new UPDATE builder
+     */
     public static UpdateBuilder update(String tableName) {
         return new UpdateBuilder(tableName);
     }
 
-    /** Creates an {@link UpdateBuilder}, resolving the table from {@code @Model}. */
+    /**
+     * Creates an {@link UpdateBuilder}, resolving the table from {@code @Model}.
+     *
+     * @param modelClass a class annotated with {@code @Model}
+     * @return a new UPDATE builder
+     * @throws IllegalArgumentException if the class lacks a {@code @Model} annotation
+     */
     public static UpdateBuilder update(Class<?> modelClass) {
         return new UpdateBuilder(ModelInspector.getTableName(modelClass));
     }
@@ -120,12 +164,23 @@ public final class DynamicQuery {
     // DELETE
     // =========================================================================
 
-    /** Creates a {@link DeleteBuilder} targeting the given table. */
+    /**
+     * Creates a {@link DeleteBuilder} targeting the given table.
+     *
+     * @param tableName the table to delete from
+     * @return a new DELETE builder
+     */
     public static DeleteBuilder delete(String tableName) {
         return new DeleteBuilder(tableName);
     }
 
-    /** Creates a {@link DeleteBuilder}, resolving the table from {@code @Model}. */
+    /**
+     * Creates a {@link DeleteBuilder}, resolving the table from {@code @Model}.
+     *
+     * @param modelClass a class annotated with {@code @Model}
+     * @return a new DELETE builder
+     * @throws IllegalArgumentException if the class lacks a {@code @Model} annotation
+     */
     public static DeleteBuilder delete(Class<?> modelClass) {
         return new DeleteBuilder(ModelInspector.getTableName(modelClass));
     }

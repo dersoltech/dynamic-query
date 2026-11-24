@@ -22,7 +22,13 @@ import com.dersoltech.dynamicquery.enums.WhereType;
  */
 public final class HavingClause {
 
-    public enum Kind { BASIC, RAW }
+    /** The shape of a HAVING predicate. */
+    public enum Kind {
+        /** A {@code column operator value} comparison. */
+        BASIC,
+        /** A raw SQL fragment inserted verbatim. */
+        RAW
+    }
 
     private final WhereType connector;
     private final Kind kind;
@@ -42,19 +48,41 @@ public final class HavingClause {
         this.rawSql    = rawSql;
     }
 
+    /**
+     * Creates a {@code column operator value} predicate.
+     *
+     * @param connector how this predicate joins the previous one
+     * @param column    the column or aggregate expression, e.g. {@code COUNT(*)}
+     * @param operator  the comparison operator, e.g. {@code >}
+     * @param value     the value to compare against
+     * @return the new predicate
+     */
     public static HavingClause basic(WhereType connector,
                                      String column, String operator, Object value) {
         return new HavingClause(connector, Kind.BASIC, column, operator, value, null);
     }
 
+    /**
+     * Creates a predicate from a raw SQL fragment.
+     *
+     * @param connector how this predicate joins the previous one
+     * @param rawSql    the SQL fragment, inserted verbatim
+     * @return the new predicate
+     */
     public static HavingClause raw(WhereType connector, String rawSql) {
         return new HavingClause(connector, Kind.RAW, null, null, null, rawSql);
     }
 
+    /** {@return how this predicate joins the previous one} */
     public WhereType getConnector() { return connector; }
+    /** {@return the shape of this predicate} */
     public Kind      getKind()      { return kind; }
+    /** {@return the column or expression, or {@code null} for {@link Kind#RAW}} */
     public String    getColumn()    { return column; }
+    /** {@return the comparison operator, or {@code null} for {@link Kind#RAW}} */
     public String    getOperator()  { return operator; }
+    /** {@return the comparison value, or {@code null} for {@link Kind#RAW}} */
     public Object    getValue()     { return value; }
+    /** {@return the raw SQL fragment, or {@code null} unless {@link Kind#RAW}} */
     public String    getRawSql()    { return rawSql; }
 }

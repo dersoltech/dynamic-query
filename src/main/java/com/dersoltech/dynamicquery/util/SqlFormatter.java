@@ -33,6 +33,9 @@ public final class SqlFormatter {
      *
      * <p>Prefixes {@link #LIKE_ESCAPE}, {@code %} and {@code _} with
      * {@link #LIKE_ESCAPE}. Example: {@code 50%_off} → {@code 50\%\_off}
+     *
+     * @param value the raw text to match literally
+     * @return the text with LIKE wildcards escaped
      */
     public static String escapeLike(String value) {
         StringBuilder sb = new StringBuilder(value.length());
@@ -54,6 +57,9 @@ public final class SqlFormatter {
      *   <li>{@link Enum}        → {@code 'ENUM_NAME'}</li>
      *   <li>Everything else     → {@code toString()} wrapped in single quotes</li>
      * </ul>
+     *
+     * @param value the value to format; may be {@code null}
+     * @return the SQL literal
      */
     public static String format(Object value) {
         return switch (value) {
@@ -70,6 +76,9 @@ public final class SqlFormatter {
      * Formats a collection of values as a parenthesized, comma-separated SQL list.
      *
      * <p>Example: {@code (1, 2, 3)} or {@code ('a', 'b')}
+     *
+     * @param values the values to format
+     * @return the parenthesized SQL list
      */
     public static String formatList(Collection<?> values) {
         StringJoiner joiner = new StringJoiner(", ", "(", ")");
@@ -83,6 +92,9 @@ public final class SqlFormatter {
      * Returns a parenthesized list of {@code count} {@code ?} placeholders.
      *
      * <p>Example: {@code placeholders(3)} → {@code (?, ?, ?)}
+     *
+     * @param count the number of placeholders
+     * @return the parenthesized placeholder list
      */
     public static String placeholders(int count) {
         StringJoiner joiner = new StringJoiner(", ", "(", ")");
