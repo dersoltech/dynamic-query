@@ -35,6 +35,12 @@ import java.util.List;
  */
 public class DeleteBuilder extends WhereCapableBuilder<DeleteBuilder> {
 
+    /**
+     * Creates a DELETE builder for the given table.
+     *
+     * @param table the target table name
+     * @throws IllegalArgumentException if {@code table} is null or blank
+     */
     public DeleteBuilder(String table) {
         super(table);
     }
@@ -43,7 +49,11 @@ public class DeleteBuilder extends WhereCapableBuilder<DeleteBuilder> {
     // SQL generation
     // =========================================================================
 
-    /** Returns a DELETE statement with inline literal values. */
+    /**
+     * Returns a DELETE statement with inline literal values.
+     *
+     * @return the SQL string
+     */
     public String sql() {
         StringBuilder sb = new StringBuilder("DELETE FROM ").append(table);
         buildWhere(sb, null);
@@ -53,6 +63,8 @@ public class DeleteBuilder extends WhereCapableBuilder<DeleteBuilder> {
     /**
      * Returns a DELETE statement with {@code ?} placeholders and the
      * corresponding ordered parameter values.
+     *
+     * @return the SQL and its parameters
      */
     public ParameterizedQuery parameterizedSql() {
         List<Object> params = new ArrayList<>();

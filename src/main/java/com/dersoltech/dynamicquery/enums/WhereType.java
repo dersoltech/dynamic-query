@@ -15,6 +15,12 @@
  */
 package com.dersoltech.dynamicquery.enums;
 
+/**
+ * The logical connector that joins a predicate to the one before it.
+ */
 public enum WhereType {
-    AND, OR
+    /** Joins the predicate with {@code AND}. */
+    AND,
+    /** Joins the predicate with {@code OR}. */
+    OR
 }

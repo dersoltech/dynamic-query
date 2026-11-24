@@ -43,6 +43,12 @@ public class UpdateBuilder extends WhereCapableBuilder<UpdateBuilder> {
 
     private final LinkedHashMap<String, Object> assignments = new LinkedHashMap<>();
 
+    /**
+     * Creates an UPDATE builder for the given table.
+     *
+     * @param table the target table name
+     * @throws IllegalArgumentException if {@code table} is null or blank
+     */
     public UpdateBuilder(String table) {
         super(table);
     }
@@ -51,7 +57,13 @@ public class UpdateBuilder extends WhereCapableBuilder<UpdateBuilder> {
     // SET
     // =========================================================================
 
-    /** Adds or replaces a {@code column = value} assignment. */
+    /**
+     * Adds or replaces a {@code column = value} assignment.
+     *
+     * @param column the column to set
+     * @param value  the new value; may be {@code null}
+     * @return this builder
+     */
     public UpdateBuilder set(String column, Object value) {
         assignments.put(column, value);
         return this;
@@ -61,7 +73,12 @@ public class UpdateBuilder extends WhereCapableBuilder<UpdateBuilder> {
     // SQL generation
     // =========================================================================
 
-    /** Returns an UPDATE statement with inline literal values. */
+    /**
+     * Returns an UPDATE statement with inline literal values.
+     *
+     * @return the SQL string
+     * @throws IllegalStateException if no SET assignment has been added
+     */
     public String sql() {
         requireAssignments();
         StringBuilder sb = buildSetClause(new StringBuilder(), null);
@@ -74,6 +91,9 @@ public class UpdateBuilder extends WhereCapableBuilder<UpdateBuilder> {
      * corresponding ordered parameter values.
      *
      * <p>SET parameters appear before WHERE parameters in the list.
+     *
+     * @return the SQL and its parameters
+     * @throws IllegalStateException if no SET assignment has been added
      */
     public ParameterizedQuery parameterizedSql() {
         requireAssignments();

@@ -38,6 +38,8 @@ public @interface Model {
     /**
      * The database table name this model maps to.
      * Defaults to a pluralized snake_case of the class name when blank.
+     *
+     * @return the table name, or an empty string to derive it from the class name
      */
     String table() default "";
 }

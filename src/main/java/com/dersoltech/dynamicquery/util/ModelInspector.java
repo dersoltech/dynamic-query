@@ -40,6 +40,8 @@ public final class ModelInspector {
      *       (e.g. {@code UserProfile} → {@code user_profiles}).</li>
      * </ol>
      *
+     * @param modelClass the model class
+     * @return the table name
      * @throws IllegalArgumentException if the class is not annotated with {@link Model}
      */
     public static String getTableName(Class<?> modelClass) {
@@ -55,6 +57,9 @@ public final class ModelInspector {
     /**
      * Returns a mapping of Java field name → database column name for every field
      * in the class hierarchy that is annotated with {@link Column}.
+     *
+     * @param modelClass the model class
+     * @return field name to column name mappings, in declaration order
      */
     public static Map<String, String> getColumnMappings(Class<?> modelClass) {
         Map<String, String> mappings = new LinkedHashMap<>();
@@ -76,6 +81,9 @@ public final class ModelInspector {
     /**
      * Returns the soft-delete column name if the class is annotated with
      * {@link SoftDeleted}, or {@code null} if it is not soft-deletable.
+     *
+     * @param modelClass the model class
+     * @return the soft-delete column name, or {@code null}
      */
     public static String getSoftDeleteColumn(Class<?> modelClass) {
         SoftDeleted annotation = modelClass.getAnnotation(SoftDeleted.class);

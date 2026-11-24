@@ -15,9 +15,21 @@
  */
 package com.dersoltech.dynamicquery.enums;
 
+/**
+ * Sort direction for an ORDER BY column.
+ */
 public enum OrderDirection {
-    ASC, DESC;
+    /** Ascending order. */
+    ASC,
+    /** Descending order. */
+    DESC;
 
+    /**
+     * Parses a direction from a string, ignoring case and surrounding whitespace.
+     *
+     * @param value the direction text, e.g. {@code "desc"}
+     * @return {@link #DESC} if {@code value} is {@code "DESC"}, otherwise {@link #ASC}
+     */
     public static OrderDirection from(String value) {
         return switch (value.toUpperCase().trim()) {
             case "DESC" -> DESC;

@@ -68,10 +68,24 @@ public class QueryBuilder extends WhereCapableBuilder<QueryBuilder> {
 
     private enum SoftDeleteMode { DEFAULT, WITH_DELETED, ONLY_DELETED }
 
+    /**
+     * Creates a SELECT builder for the given table with no soft-delete filtering.
+     *
+     * @param table the table to select from
+     * @throws IllegalArgumentException if {@code table} is null or blank
+     */
     public QueryBuilder(String table) {
         this(table, null);
     }
 
+    /**
+     * Creates a SELECT builder for the given table.
+     *
+     * @param table                   the table to select from
+     * @param primarySoftDeleteColumn the table's soft-delete column, or {@code null}
+     *                                if the table is not soft-deletable
+     * @throws IllegalArgumentException if {@code table} is null or blank
+     */
     public QueryBuilder(String table, String primarySoftDeleteColumn) {
         super(table);
         this.primarySoftDeleteColumn = primarySoftDeleteColumn;
@@ -81,6 +95,8 @@ public class QueryBuilder extends WhereCapableBuilder<QueryBuilder> {
      * Includes soft-deleted rows in the result — suppresses the automatic
      * {@code IS NULL} filter on the primary table and any soft-deletable
      * JOIN targets.
+     *
+     * @return this builder
      */
     public QueryBuilder withDeleted() {
         this.softDeleteMode = SoftDeleteMode.WITH_DELETED;
@@ -91,6 +107,8 @@ public class QueryBuilder extends WhereCapableBuilder<QueryBuilder> {
      * Restricts the result to soft-deleted rows only — changes the primary
      * table filter to {@code IS NOT NULL}. Soft-deletable JOIN targets retain
      * their {@code IS NULL} filter (returning only their active rows).
+     *
+     * @return this builder
      */
     public QueryBuilder onlyDeleted() {
         this.softDeleteMode = SoftDeleteMode.ONLY_DELETED;
@@ -115,6 +133,9 @@ public class QueryBuilder extends WhereCapableBuilder<QueryBuilder> {
     /**
      * Replaces the column list with the given columns.
      * Passing no arguments selects all columns ({@code SELECT *}).
+     *
+     * @param cols the columns to select
+     * @return this builder
      */
     public QueryBuilder select(String... cols) {
         columns.clear();
@@ -122,13 +143,22 @@ public class QueryBuilder extends WhereCapableBuilder<QueryBuilder> {
         return this;
     }
 
-    /** Appends additional columns without clearing the existing list. */
+    /**
+     * Appends additional columns without clearing the existing list.
+     *
+     * @param cols the columns to add
+     * @return this builder
+     */
     public QueryBuilder addSelect(String... cols) {
         columns.addAll(Arrays.asList(cols));
         return this;
     }
 
-    /** Adds a {@code DISTINCT} modifier to the SELECT. */
+    /**
+     * Adds a {@code DISTINCT} modifier to the SELECT.
+     *
+     * @return this builder
+     */
     public QueryBuilder distinct() {
         this.distinct = true;
         return this;
@@ -138,24 +168,57 @@ public class QueryBuilder extends WhereCapableBuilder<QueryBuilder> {
     // JOIN
     // =========================================================================
 
+    /**
+     * Adds a {@code INNER JOIN} clause for the given table.
+     *
+     * @param joinTable the table to join
+     * @param first     the left-hand column of the ON condition
+     * @param operator  the ON condition operator, e.g. {@code =}
+     * @param second    the right-hand column of the ON condition
+     * @return this builder
+     */
     public QueryBuilder join(String joinTable,
                              String first, String operator, String second) {
         joins.add(new JoinClause(JoinType.INNER, joinTable, first, operator, second));
         return this;
     }
 
+    /**
+     * Adds a {@code LEFT JOIN} clause for the given table.
+     *
+     * @param joinTable the table to join
+     * @param first     the left-hand column of the ON condition
+     * @param operator  the ON condition operator, e.g. {@code =}
+     * @param second    the right-hand column of the ON condition
+     * @return this builder
+     */
     public QueryBuilder leftJoin(String joinTable,
                                  String first, String operator, String second) {
         joins.add(new JoinClause(JoinType.LEFT, joinTable, first, operator, second));
         return this;
     }
 
+    /**
+     * Adds a {@code RIGHT JOIN} clause for the given table.
+     *
+     * @param joinTable the table to join
+     * @param first     the left-hand column of the ON condition
+     * @param operator  the ON condition operator, e.g. {@code =}
+     * @param second    the right-hand column of the ON condition
+     * @return this builder
+     */
     public QueryBuilder rightJoin(String joinTable,
                                   String first, String operator, String second) {
         joins.add(new JoinClause(JoinType.RIGHT, joinTable, first, operator, second));
         return this;
     }
 
+    /**
+     * Adds a {@code CROSS JOIN} on the given table.
+     *
+     * @param joinTable the table to join
+     * @return this builder
+     */
     public QueryBuilder crossJoin(String joinTable) {
         joins.add(new JoinClause(JoinType.CROSS, joinTable, null, null, null));
         return this;
@@ -165,6 +228,13 @@ public class QueryBuilder extends WhereCapableBuilder<QueryBuilder> {
      * INNER JOIN resolved from a {@code @Model}-annotated class.
      * If the class is also annotated with {@code @SoftDeleted}, the soft-delete
      * filter is added to the ON condition automatically.
+     *
+     * @param modelClass a class annotated with {@code @Model}
+     * @param first      the left-hand column of the ON condition
+     * @param operator   the ON condition operator, e.g. {@code =}
+     * @param second     the right-hand column of the ON condition
+     * @return this builder
+     * @throws IllegalArgumentException if the class lacks a {@code @Model} annotation
      */
     public QueryBuilder join(Class<?> modelClass,
                              String first, String operator, String second) {
@@ -172,14 +242,36 @@ public class QueryBuilder extends WhereCapableBuilder<QueryBuilder> {
         return this;
     }
 
-    /** LEFT JOIN resolved from a {@code @Model}-annotated class. */
+    /**
+     * LEFT JOIN resolved from a {@code @Model}-annotated class.
+     * If the class is also annotated with {@code @SoftDeleted}, the soft-delete
+     * filter is added to the ON condition automatically.
+     *
+     * @param modelClass a class annotated with {@code @Model}
+     * @param first      the left-hand column of the ON condition
+     * @param operator   the ON condition operator, e.g. {@code =}
+     * @param second     the right-hand column of the ON condition
+     * @return this builder
+     * @throws IllegalArgumentException if the class lacks a {@code @Model} annotation
+     */
     public QueryBuilder leftJoin(Class<?> modelClass,
                                  String first, String operator, String second) {
         joins.add(joinClauseFrom(JoinType.LEFT, modelClass, first, operator, second));
         return this;
     }
 
-    /** RIGHT JOIN resolved from a {@code @Model}-annotated class. */
+    /**
+     * RIGHT JOIN resolved from a {@code @Model}-annotated class.
+     * If the class is also annotated with {@code @SoftDeleted}, the soft-delete
+     * filter is added to the ON condition automatically.
+     *
+     * @param modelClass a class annotated with {@code @Model}
+     * @param first      the left-hand column of the ON condition
+     * @param operator   the ON condition operator, e.g. {@code =}
+     * @param second     the right-hand column of the ON condition
+     * @return this builder
+     * @throws IllegalArgumentException if the class lacks a {@code @Model} annotation
+     */
     public QueryBuilder rightJoin(Class<?> modelClass,
                                   String first, String operator, String second) {
         joins.add(joinClauseFrom(JoinType.RIGHT, modelClass, first, operator, second));
@@ -197,26 +289,60 @@ public class QueryBuilder extends WhereCapableBuilder<QueryBuilder> {
     // GROUP BY / HAVING
     // =========================================================================
 
+    /**
+     * Appends columns to the GROUP BY clause.
+     *
+     * @param cols the columns to group by
+     * @return this builder
+     */
     public QueryBuilder groupBy(String... cols) {
         groupBys.addAll(Arrays.asList(cols));
         return this;
     }
 
+    /**
+     * Adds a {@code AND column operator value} HAVING predicate.
+     *
+     * @param column   the column or aggregate expression, e.g. {@code COUNT(*)}
+     * @param operator the comparison operator, e.g. {@code >}
+     * @param value    the value to compare against
+     * @return this builder
+     */
     public QueryBuilder having(String column, String operator, Object value) {
         havings.add(HavingClause.basic(WhereType.AND, column, operator, value));
         return this;
     }
 
+    /**
+     * Adds a {@code OR column operator value} HAVING predicate.
+     *
+     * @param column   the column or aggregate expression, e.g. {@code COUNT(*)}
+     * @param operator the comparison operator, e.g. {@code >}
+     * @param value    the value to compare against
+     * @return this builder
+     */
     public QueryBuilder orHaving(String column, String operator, Object value) {
         havings.add(HavingClause.basic(WhereType.OR, column, operator, value));
         return this;
     }
 
+    /**
+     * Adds a raw {@code AND} HAVING predicate — caller is responsible for correct SQL.
+     *
+     * @param rawSql the SQL fragment, inserted verbatim
+     * @return this builder
+     */
     public QueryBuilder havingRaw(String rawSql) {
         havings.add(HavingClause.raw(WhereType.AND, rawSql));
         return this;
     }
 
+    /**
+     * Adds a raw {@code OR} HAVING predicate — caller is responsible for correct SQL.
+     *
+     * @param rawSql the SQL fragment, inserted verbatim
+     * @return this builder
+     */
     public QueryBuilder orHavingRaw(String rawSql) {
         havings.add(HavingClause.raw(WhereType.OR, rawSql));
         return this;
@@ -226,23 +352,46 @@ public class QueryBuilder extends WhereCapableBuilder<QueryBuilder> {
     // ORDER BY
     // =========================================================================
 
-    /** Adds {@code ORDER BY column ASC}. */
+    /**
+     * Adds {@code ORDER BY column ASC}.
+     *
+     * @param column the column to sort by
+     * @return this builder
+     */
     public QueryBuilder orderBy(String column) {
         orders.add(new OrderByClause(column, OrderDirection.ASC));
         return this;
     }
 
-    /** Adds {@code ORDER BY column direction}. */
+    /**
+     * Adds {@code ORDER BY column direction}.
+     *
+     * @param column    the column to sort by
+     * @param direction {@code "ASC"} or {@code "DESC"} (case-insensitive); anything else means ASC
+     * @return this builder
+     */
     public QueryBuilder orderBy(String column, String direction) {
         orders.add(new OrderByClause(column, OrderDirection.from(direction)));
         return this;
     }
 
+    /**
+     * Adds {@code ORDER BY column ASC}.
+     *
+     * @param column the column to sort by
+     * @return this builder
+     */
     public QueryBuilder orderByAsc(String column) {
         orders.add(new OrderByClause(column, OrderDirection.ASC));
         return this;
     }
 
+    /**
+     * Adds {@code ORDER BY column DESC}.
+     *
+     * @param column the column to sort by
+     * @return this builder
+     */
     public QueryBuilder orderByDesc(String column) {
         orders.add(new OrderByClause(column, OrderDirection.DESC));
         return this;
@@ -252,12 +401,26 @@ public class QueryBuilder extends WhereCapableBuilder<QueryBuilder> {
     // LIMIT / OFFSET
     // =========================================================================
 
+    /**
+     * Sets the LIMIT clause.
+     *
+     * @param limit the maximum number of rows to return
+     * @return this builder
+     * @throws IllegalArgumentException if {@code limit} is negative
+     */
     public QueryBuilder limit(int limit) {
         if (limit < 0) throw new IllegalArgumentException("LIMIT must be >= 0");
         this.limitVal = limit;
         return this;
     }
 
+    /**
+     * Sets the OFFSET clause.
+     *
+     * @param offset the number of rows to skip
+     * @return this builder
+     * @throws IllegalArgumentException if {@code offset} is negative
+     */
     public QueryBuilder offset(int offset) {
         if (offset < 0) throw new IllegalArgumentException("OFFSET must be >= 0");
         this.offsetVal = offset;
@@ -272,6 +435,8 @@ public class QueryBuilder extends WhereCapableBuilder<QueryBuilder> {
      * Builds and returns the SQL string representing the current state of the
      * builder. Each call re-generates the SQL from scratch — the builder is
      * not consumed.
+     *
+     * @return the SQL string
      */
     public String sql() {
         StringBuilder sb = new StringBuilder();
@@ -298,6 +463,8 @@ public class QueryBuilder extends WhereCapableBuilder<QueryBuilder> {
      *
      * <p>The {@link ParameterizedQuery#parameters()} list is unmodifiable and
      * ordered left-to-right, matching placeholder positions exactly.
+     *
+     * @return the SQL and its parameters
      */
     public ParameterizedQuery parameterizedSql() {
         List<Object> params = new ArrayList<>();

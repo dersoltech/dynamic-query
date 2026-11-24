@@ -15,10 +15,17 @@
  */
 package com.dersoltech.dynamicquery.enums;
 
+/**
+ * The kinds of SQL JOIN supported by the query builder.
+ */
 public enum JoinType {
+    /** {@code INNER JOIN} — only rows with a match in both tables. */
     INNER("INNER JOIN"),
+    /** {@code LEFT JOIN} — all rows from the left table, matched rows from the right. */
     LEFT("LEFT JOIN"),
+    /** {@code RIGHT JOIN} — all rows from the right table, matched rows from the left. */
     RIGHT("RIGHT JOIN"),
+    /** {@code CROSS JOIN} — the Cartesian product of both tables. */
     CROSS("CROSS JOIN");
 
     private final String sql;
@@ -27,6 +34,11 @@ public enum JoinType {
         this.sql = sql;
     }
 
+    /**
+     * Returns the SQL keyword(s) for this join type.
+     *
+     * @return the SQL keyword(s), e.g. {@code "LEFT JOIN"}
+     */
     public String getSql() {
         return sql;
     }
